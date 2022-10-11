@@ -26,7 +26,14 @@ module.exports = {
         new MiniCssExtractPlugin({ filename: "styles/[contenthash].css" })
     ],
     devServer: {
-        static: "./dist"
+        static: "./dist",
+        hot: true,
+        proxy: {
+            '/app.html': {
+                target: 'http://localhost:8080',
+                pathRewrite: { '^/app.html': '/home' },
+            },
+        }
     },
 
     module: {

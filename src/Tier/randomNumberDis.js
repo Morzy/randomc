@@ -33,7 +33,7 @@ function RandomDis({ stopP }) {
 
 
 
-    const generateRando = () => {
+    const generateRando = async () => {
         let num = Math.round(Math.random() * 312) + "";
         if (num.lastIndexOf("4") > -1) {
             return generateRando();

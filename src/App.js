@@ -14,7 +14,7 @@ import {
 function App() {
   return (
     <><Routes>
-      <Route path="/" element={<Layout />}> 
+      <Route path="/home" element={<Layout />}> 
       <Route path="third" element={<TierThree/>} />
       <Route path="second" element={<TierTwo/>} />
       <Route path="first" element={<TierOne/>} />
