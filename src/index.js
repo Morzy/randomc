@@ -8,11 +8,29 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 //import 'bootstrap/dist/js/bootstrap';
 const { Route, BrowserRouter, Routes } = require("react-router-dom");
 
+import { configureStore } from '@reduxjs/toolkit';
+import { caculate } from './redux/Caculate';
+import { connect, Provider } from 'react-redux';
+
+const store = configureStore({ reducer: caculate })
+
+store.subscribe(() => {
+  console.log(store.getState())
+})
+
+function add() {
+  return { type: "Add" }
+}
+let mapDispatchToProp = { add }
+let Smart = connect(null, mapDispatchToProp)(App);
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
+    <BrowserRouter basename={'/'}>
+      <Provider store={store}>
+        <Smart />
+      </Provider>
     </BrowserRouter>
   </React.StrictMode>
 );

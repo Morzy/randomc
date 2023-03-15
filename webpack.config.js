@@ -5,22 +5,30 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const yaml = require('yaml')
 
 const path = require('path');
+const { webpack } = require('webpack');
+const dotenv = require('dotenv').config()
+console.log(process.env.NODE_ENV)
 
 module.exports = {
 
-    entry: './src/index.js',
+    entry: {
+        index: {
+            import: './src/index.js',
+        },
+        //与最后的 splitChunks 类似
+    },
     output: {
-        filename: "bundle.js",
+        filename: "[name].bundle.js",
         path: path.resolve(__dirname, './dist'),
         clean: true,
-        assetModuleFilename: "image/[contenthash][ext]"
+        //assetModuleFilename: "image/[contenthash][ext]"
     },
     mode: "development",
-
+    devtool: 'inline-source-map',
     plugins: [
         new HtmlWebpackPlugin({
             template: "./public/index.html",
-            filename: "app.html",
+            filename: "index.html",
             // inject: "body" 
         }),
         new MiniCssExtractPlugin({ filename: "styles/[contenthash].css" })
@@ -28,12 +36,14 @@ module.exports = {
     devServer: {
         static: "./dist",
         hot: true,
-        proxy: {
-            '/app.html': {
-                target: 'http://localhost:8080',
-                pathRewrite: { '^/app.html': '/home' },
-            },
-        }
+        port: 9300,
+        historyApiFallback: true,
+        // proxy: {
+        //     '/app.html': {
+        //         target: 'http://localhost:8080',
+        //         pathRewrite: { '^/app.html': '/home' },
+        //     },
+        // }
     },
 
     module: {
@@ -49,9 +59,16 @@ module.exports = {
                 }
             },
             {
+                test: /\.(ts|tsx)$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'ts-loader'
+                }
+            },
+            {
                 test: /\.png$/,
                 type: "asset/resource",
-                generator: { filename: "image/[contenthash][ext]" }
+                generator: { filename: "image/[name][ext]" }
             },
             {
                 test: /\.svg$/,
@@ -79,19 +96,27 @@ module.exports = {
                         maxSize: 4 * 1024
                     }
                 },
-                generator: { filename: "image/[contenthash][ext]" }
+                generator: { filename: "image/[name][ext]" }
             },
             {
                 test: /\.(css|less)$/,
                 //type: "asset/source",
-                use: [MiniCssExtractPlugin.loader, "css-loader"]
-                //generator: { filename: "image/[contenthash][ext]" }
+                use: [MiniCssExtractPlugin.loader, "css-loader"],
+                generator: { filename: "styles/[name][ext]" }
             },
         ]
     },
     optimization: {
         minimizer: [
             new CssMinimizerPlugin() //需要把mode 改成production
-        ]
+        ],
+        runtimeChunk: 'single',
+        splitChunks:{
+            chunks:"all"
+        }
+
+    },
+    resolve: {
+        extensions: [".ts", ".js",".tsx"],
     }
 }
